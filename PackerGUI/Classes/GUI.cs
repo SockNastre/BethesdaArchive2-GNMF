@@ -33,7 +33,7 @@ namespace PackerGUI.Classes
 
             using (var reader = new BinaryReader(File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read)))
             {
-                if (reader.ReadInt32() != (int)KeyInts.GNFMagic) throw new Exception("Invalid magic number");
+                if (reader.ReadInt32() != GNF.Magic) throw new Exception("Invalid magic number, double check file is a GNF texture.");
 
                 // Where gnf meta used in GNMF BA2 is stored
                 reader.BaseStream.Position = 0x10;
@@ -56,7 +56,10 @@ namespace PackerGUI.Classes
         /// <returns>List of GNF with correct properties.</returns>
         public static List<GNF> ConvertListViewItems(ListView.ListViewItemCollection items)
         {
+            if (items.Count == 0) throw new Exception("No assets to save.");
+
             var gnf = new List<GNF>();
+            bool errorAsset = false;
 
             foreach (ListViewItem item in items)
             {
@@ -67,7 +70,29 @@ namespace PackerGUI.Classes
                     Meta = (byte[])item.Tag // Item tag contains gnf meta
                 };
 
-                gnf.Add(g);
+                if (File.Exists(g.RealPath))
+                {
+                    gnf.Add(g);
+                }
+                else
+                {
+                    errorAsset = true;
+                }
+            }
+
+            if (gnf.Count == 0)
+            {
+                throw new Exception("No assets to save, cannot locate real file path on OS.");
+            }
+            else if (errorAsset)
+            {
+                DialogResult dr = MessageBox.Show("One or more assets has been omitted due to those assets not being found in real file path on OS." +
+                       "\n\nWould you like to continue?", "Error", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+
+                if (dr == DialogResult.No)
+                {
+                    throw new Exception("Cancel");
+                }
             }
 
             return gnf;

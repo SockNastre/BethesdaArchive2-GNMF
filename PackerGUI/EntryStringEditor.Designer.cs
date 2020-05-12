@@ -46,6 +46,7 @@
             // richTextBoxEntryString
             // 
             this.richTextBoxEntryString.Location = new System.Drawing.Point(12, 25);
+            this.richTextBoxEntryString.MaxLength = 65535;
             this.richTextBoxEntryString.Name = "richTextBoxEntryString";
             this.richTextBoxEntryString.Size = new System.Drawing.Size(594, 120);
             this.richTextBoxEntryString.TabIndex = 2;

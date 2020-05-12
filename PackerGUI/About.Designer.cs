@@ -28,16 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(About));
             this.buttonOkay = new System.Windows.Forms.Button();
-            this.labelAboutInfo = new System.Windows.Forms.Label();
-            this.pictureBoxApplicationLogo = new System.Windows.Forms.PictureBox();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxApplicationLogo)).BeginInit();
+            this.richTextBoxCredits = new System.Windows.Forms.RichTextBox();
+            this.labelAboutInformation = new System.Windows.Forms.Label();
+            this.pictureBoxApplicationIcon = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxApplicationIcon)).BeginInit();
             this.SuspendLayout();
             // 
             // buttonOkay
             // 
             this.buttonOkay.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonOkay.Location = new System.Drawing.Point(296, 127);
+            this.buttonOkay.Location = new System.Drawing.Point(337, 327);
             this.buttonOkay.Name = "buttonOkay";
             this.buttonOkay.Size = new System.Drawing.Size(75, 23);
             this.buttonOkay.TabIndex = 11;
@@ -45,38 +47,51 @@
             this.buttonOkay.UseVisualStyleBackColor = true;
             this.buttonOkay.Click += new System.EventHandler(this.buttonOkay_Click);
             // 
-            // labelAboutInfo
+            // richTextBoxCredits
             // 
-            this.labelAboutInfo.AutoSize = true;
-            this.labelAboutInfo.Location = new System.Drawing.Point(82, 12);
-            this.labelAboutInfo.Name = "labelAboutInfo";
-            this.labelAboutInfo.Size = new System.Drawing.Size(165, 39);
-            this.labelAboutInfo.TabIndex = 10;
-            this.labelAboutInfo.Text = "BethesdaArchive2 GNMF Packer\r\nVersion: 1.0.0.0\r\nCopyright ©  2020, SockNastre";
+            this.richTextBoxCredits.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.richTextBoxCredits.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.richTextBoxCredits.Location = new System.Drawing.Point(11, 93);
+            this.richTextBoxCredits.Name = "richTextBoxCredits";
+            this.richTextBoxCredits.ReadOnly = true;
+            this.richTextBoxCredits.Size = new System.Drawing.Size(400, 228);
+            this.richTextBoxCredits.TabIndex = 31;
+            this.richTextBoxCredits.Text = resources.GetString("richTextBoxCredits.Text");
             // 
-            // pictureBoxApplicationLogo
+            // labelAboutInformation
             // 
-            this.pictureBoxApplicationLogo.Location = new System.Drawing.Point(12, 12);
-            this.pictureBoxApplicationLogo.Name = "pictureBoxApplicationLogo";
-            this.pictureBoxApplicationLogo.Size = new System.Drawing.Size(64, 64);
-            this.pictureBoxApplicationLogo.TabIndex = 9;
-            this.pictureBoxApplicationLogo.TabStop = false;
+            this.labelAboutInformation.AutoSize = true;
+            this.labelAboutInformation.Location = new System.Drawing.Point(81, 12);
+            this.labelAboutInformation.Name = "labelAboutInformation";
+            this.labelAboutInformation.Size = new System.Drawing.Size(165, 39);
+            this.labelAboutInformation.TabIndex = 30;
+            this.labelAboutInformation.Text = "BethesdaArchive2 GNMF Packer\r\nVersion: 1.1.2.0\r\nCopyright©  2020 SockNastre";
+            // 
+            // pictureBoxApplicationIcon
+            // 
+            this.pictureBoxApplicationIcon.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.pictureBoxApplicationIcon.Location = new System.Drawing.Point(11, 12);
+            this.pictureBoxApplicationIcon.Name = "pictureBoxApplicationIcon";
+            this.pictureBoxApplicationIcon.Size = new System.Drawing.Size(64, 68);
+            this.pictureBoxApplicationIcon.TabIndex = 29;
+            this.pictureBoxApplicationIcon.TabStop = false;
             // 
             // About
             // 
             this.AcceptButton = this.buttonOkay;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(383, 162);
+            this.ClientSize = new System.Drawing.Size(423, 358);
+            this.Controls.Add(this.richTextBoxCredits);
+            this.Controls.Add(this.labelAboutInformation);
+            this.Controls.Add(this.pictureBoxApplicationIcon);
             this.Controls.Add(this.buttonOkay);
-            this.Controls.Add(this.labelAboutInfo);
-            this.Controls.Add(this.pictureBoxApplicationLogo);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "About";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "About";
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxApplicationLogo)).EndInit();
+            this.Text = "About BethesdaArchive2 GNMF Packer";
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxApplicationIcon)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -85,7 +100,8 @@
         #endregion
 
         private System.Windows.Forms.Button buttonOkay;
-        private System.Windows.Forms.Label labelAboutInfo;
-        private System.Windows.Forms.PictureBox pictureBoxApplicationLogo;
+        private System.Windows.Forms.RichTextBox richTextBoxCredits;
+        private System.Windows.Forms.Label labelAboutInformation;
+        private System.Windows.Forms.PictureBox pictureBoxApplicationIcon;
     }
 }

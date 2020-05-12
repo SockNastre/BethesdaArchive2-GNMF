@@ -7,8 +7,8 @@ namespace PackerGUI
     public partial class EntryStringEditor : Form
     {
         // Needed so we can modify the ListViewItem on this form
-        readonly Packer PackerForm;
-        readonly int ItemIndex;
+        private readonly Packer PackerForm;
+        private readonly int ItemIndex;
 
         public EntryStringEditor(ListViewItem item, Packer packerForm)
         {

@@ -9,7 +9,6 @@ namespace PackerGUI
 {
     public partial class Packer : Form
     {
-        private readonly string Version = "1.0.0.0";
         public string ArchivePath = String.Empty;
 
         public Packer()
@@ -26,16 +25,23 @@ namespace PackerGUI
         {
             try
             {
-                if (ArchivePath != String.Empty)
-                {
-                    List<GNF> gnf = GUI.ConvertListViewItems(listViewAssets.Items);
-                    GNMF.Write(ArchivePath, gnf);
+                if (string.IsNullOrEmpty(ArchivePath)) return;
 
-                    MessageBox.Show("Done!", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                }
+                List<GNF> gnf = GUI.ConvertListViewItems(listViewAssets.Items);
+
+                string formText = this.Text;
+                this.Text = "Packing...";
+
+                GNMF.Write(ArchivePath, gnf);
+
+                this.Text = formText;
+                MessageBox.Show("Done!", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
             catch (Exception ex)
             {
+                // Indicates the user cancelled the writing process somehow
+                if (ex.Message.Equals("Cancel")) return;
+
                 MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -48,8 +54,13 @@ namespace PackerGUI
                 {
                     string savePath = saveFileDialogGNMF.FileName;
                     List<GNF> gnf = GUI.ConvertListViewItems(listViewAssets.Items);
+
+                    string formText = this.Text;
+                    this.Text = "Packing...";
+
                     GNMF.Write(savePath, gnf);
 
+                    this.Text = formText;
                     MessageBox.Show("Done!", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
 
                     // Sets public path to archive for "Save" function
@@ -59,6 +70,9 @@ namespace PackerGUI
             }
             catch (Exception ex)
             {
+                // Indicates the user cancelled the writing process somehow
+                if (ex.Message.Equals("Cancel")) return;
+
                 MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -131,12 +145,6 @@ namespace PackerGUI
             {
                 listViewAssets.Items.RemoveAt(item.Index);
             }
-
-            if (listViewAssets.Items.Count < 1)
-            {
-                // Just resets everything if all items are deleted
-                newToolStripMenuItem.PerformClick();
-            }
         }
 
         private void selectAllToolStripMenuItem_Click(object sender, EventArgs e)
@@ -147,7 +155,7 @@ namespace PackerGUI
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var aboutForm = new About(Version);
+            var aboutForm = new About();
             aboutForm.ShowDialog();
         }
 
@@ -214,6 +222,8 @@ namespace PackerGUI
 
         private void listViewAssets_ItemActivate(object sender, EventArgs e)
         {
+            if (listViewAssets.SelectedItems.Count == 0 || listViewAssets.SelectedItems.Count > 1) return;
+
             var editorForm = new EntryStringEditor(listViewAssets.SelectedItems[0], this);
             editorForm.ShowDialog();
         }

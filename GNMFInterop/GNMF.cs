@@ -1,4 +1,5 @@
-﻿using Ionic.Zlib;
+﻿using ICSharpCode.SharpZipLib.Zip.Compression;
+using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,11 +10,6 @@ namespace GNMFInterop
     public static class GNMF
     {
         /// <summary>
-        /// Current archive version
-        /// </summary>
-        private static readonly uint Version = 1;
-
-        /// <summary>
         /// Writes GNMF BA2 using a list of assets.
         /// </summary>
         /// <param name="path">Path to save GNMF BA2.</param>
@@ -22,14 +18,14 @@ namespace GNMFInterop
         {
             using (var writer = new BinaryWriter(File.Open(path, FileMode.Create, FileAccess.Write, FileShare.Read)))
             {
-                writer.Write((uint)KeyInts.GNMFMagic);
-                writer.Write(Version);
-                writer.Write((uint)KeyInts.Format);
+                writer.Write(0x58445442); // "BTDX"
+                writer.Write(1); // Version
+                writer.Write(0x464D4E47); // "GNMF"
                 writer.Write(assets.Count);
                 writer.Write((long)-1); // Temporary, EntryStringTable Offset
 
-                // Pads out Asset Records which we will write to later
-                writer.Write(new byte[assets.Count * (uint)KeyInts.AssetRecordSize]);
+                // Pads out Asset Records which we will write to later, each Asset Record takes up 72 bytes
+                writer.Write(new byte[assets.Count * 72]);
 
                 // Writing texture data
                 foreach (GNF gnf in assets)
@@ -37,17 +33,10 @@ namespace GNMFInterop
                     gnf.Offset = (uint)writer.BaseStream.Position;
 
                     // We can skip reading any of the header, since we already got the gnf meta beforehand
-                    byte[] texture = File.ReadAllBytes(gnf.RealPath).Skip((int)KeyInts.GNFHeaderSize).ToArray();
+                    byte[] texture = File.ReadAllBytes(gnf.RealPath).Skip(GNF.HeaderSize).ToArray();
 
-                    using (var compress = new ZlibStream(new MemoryStream(texture), CompressionMode.Compress, CompressionLevel.Default))
-                    {
-                        // Creates new stream and convertes to byte array
-                        var m = new MemoryStream();
-                        compress.CopyTo(m);
-                        writer.Write(m.ToArray());
-
-                        gnf.Size = (uint)m.Length;
-                    }
+                    // Data to be compressed is only the data of the GNF not it's header, header metadata is stored in Asset Records
+                    writer.Write(GetCompressedZlib(texture, gnf));
 
                     // Just the size of texture data, not the header
                     gnf.OrgSize = (uint)texture.Length;
@@ -72,18 +61,40 @@ namespace GNMFInterop
                 foreach (GNF gnf in assets)
                 {
                     writer.Write(CRC32.Compute(Path.GetFileNameWithoutExtension(gnf.EntryStr).ToLower()));
-                    writer.Write((uint)KeyInts.TextureIndicator);
+                    writer.Write(0x00736464); // "dds" + 0x00, indicates asset format (in this case dds just means it's a texture)
                     writer.Write(CRC32.Compute(Path.GetDirectoryName(gnf.EntryStr).ToLower()));
                     writer.Write((byte)0); // Unk
                     writer.Write((byte)1); // Chunk count, tool just suppports one chunk atm
-                    writer.Write((short)48); // Unk
+                    writer.Write((short)48); // Size of data here and until "Alignment"
                     writer.Write(gnf.Meta);
                     writer.Write(gnf.Offset);
                     writer.Write(gnf.Size);
                     writer.Write(gnf.OrgSize);
                     writer.Write(0); // Unk
-                    writer.Write((uint)KeyInts.Alignment);
+                    writer.Write(0xBAADF00D); // "Alignment", not sure what this is but it is constant
                 }
+            }
+        }
+
+        private static byte[] GetCompressedZlib(byte[] data, GNF gnf)
+        {
+            if (data == null || data.Length == 0) return data;
+
+            using (var inStream = new MemoryStream(data))
+            {
+                var outStream = new MemoryStream();
+                var compressStream = new DeflaterOutputStream(outStream, new Deflater(Deflater.DEFAULT_COMPRESSION));
+                int bufferSize;
+                var buffer = new byte[4096];
+
+                while ((bufferSize = inStream.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    compressStream.Write(buffer, 0, bufferSize);
+                }
+
+                compressStream.Finish();
+                gnf.Size = (uint)outStream.Length;
+                return outStream.ToArray();
             }
         }
     }
