@@ -16,7 +16,7 @@ Q: _Why only one chunk? Does that matter?_
 A: I have not researched multi-chunk GNMF BA2 but for authenticities sake I will try to include the option in a future release. From experience one chunk will do fine, but it can be assumed with a lot of high resolution textures multi-chunk would help.
 
 ### Credits
- - Thanks to [AlexxEG](https://github.com/AlexxEG) for help with understanding original BA2 format.
+ - Thanks to [AlexxEG](https://github.com/AlexxEG) for help with understanding original BA2 format and helping me understand buffers and SharpZipLib.
  - Thanks to derwangler for getting me a proper CRC32 hashing class.
- - [DotNetZip](https://github.com/DinoChiesa/DotNetZip) library for zlib compression.
+ - [SharpZipLib](https://github.com/icsharpcode/SharpZipLib) library for zlib compression.
  - Josip Medved for the OpenFolderDialog.
