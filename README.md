@@ -15,7 +15,7 @@ A: The [BSA Browser](https://github.com/AlexxEG/BSA_Browser) tool by AlexxEG (se
 Q: _Why only one chunk? Does that matter?_  
 A: I have not researched multi-chunk GNMF BA2 but for authenticities sake I will try to include the option in a future release. From experience one chunk will do fine, but it can be assumed with a lot of high resolution textures multi-chunk would help.
 
-Q: _What does saving the String Table do?_
+Q: _What does saving the String Table do?_  
 A: By default this should be on, but this removes the table from the packed output. It shouldn't have any effects on mods loading, but may effect loading from archive readers. Personally I recommend keeping this on.
 
 ### Credits
