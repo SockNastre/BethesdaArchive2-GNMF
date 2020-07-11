@@ -10,8 +10,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("BethesdaArchive2 GNMF Packer")]
-[assembly: AssemblyCopyright("Copyright © 2020 SockNastre")]
+[assembly: AssemblyProduct("BethesdaArchive2 GNMF")]
+[assembly: AssemblyCopyright("Copyright ©  2020  SockNastre")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -34,5 +34,5 @@ using System.Runtime.InteropServices;
 // utilizando el carácter "*", como se muestra a continuación:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.1.2.0")]
-[assembly: NeutralResourcesLanguage("en-US")]
+[assembly: AssemblyFileVersion("1.2.3.1")]
+[assembly: NeutralResourcesLanguage("")]

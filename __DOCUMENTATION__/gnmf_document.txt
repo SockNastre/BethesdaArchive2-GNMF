@@ -1,0 +1,46 @@
+#
+# GNMF BA2 ARCHIVE FORMAT | VERSION 1
+# BY: SOCKNASTRE
+#
+# Associated Documents: gnmf_structs.cs
+#
+# All information in this document (plus associated documents above) is 
+# free to use as you wish.
+#
+
+NOTE: This documentation is based on the single-chunk GNMF Archive, multi-chunk may differ
+slightly. Also make sure to follow reading this along with gnmf_structs.cs. :D
+
+GNMF Structure:
+	1. Header
+
+If entryStringTableOffset is set to 0, it is an indicator that the Entry String Table is not
+saved, therefore, it won't appear at the end of the file.
+
+	2. Asset Records
+
+For every asset being packed there is an AssetRecord struct here. The nameHash is a CRC32
+hash of the name of the file without the extension all lowercase. The directoryHash is a
+CRC32 hash of the directory of the file (no name) all lowercase.
+
+In order to obtain the meta of an asset (which should be a GNF texture file), go to offset
+0x10 of the asset and then grab 32 bytes from there; that is the meta.
+
+The "offset" in an Asset Record points (relative to the entire file) to the spot in the section
+below, "Texture Data" where the compressed header-less GNF texture data is.
+
+The "size" is the size of the asset inside of the GNMF BA2 (after compression with no GNF
+header), the "originalSize" is the size of the asset before compression and before being
+packed also not including the length of the GNF header (256).
+
+	3. Texture Data
+
+Just a bunch of the compressed texture data, compression should be default level (6) Zlib,
+usually the texture data located here is written in the same order as the Asset Records,
+but, as long as the "offset" variable in the Asset Record points correctly to the data
+it doesn't really matter. I suppose you could go insane and maybe switch the locations
+of things like the Entry String Table to be before any of the texture data...
+
+	4. Entry String Table (Optional)
+
+The name of every asset in the same order as the Asset Records.

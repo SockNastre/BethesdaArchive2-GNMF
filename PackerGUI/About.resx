@@ -118,13 +118,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="richTextBoxCredits.Text" xml:space="preserve">
-    <value>[Credits]
+    <value>[Resources]
 
 Project: SharpZipLib
 Copyright © 2000-2018 SharpZipLib Contributors
 License (MIT): https://github.com/icsharpcode/SharpZipLib/blob/master/LICENSE.txt
 
-[Acknowledgements]
+[Thanks]
 
 AlexxEG for help with understanding original BA2 format and helping me understand buffers and SharpZipLib.
 

@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PackerGUI", "PackerGUI\Pack
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GNMFInterop", "GNMFInterop\GNMFInterop.csproj", "{9901CC98-6531-437B-931C-18626B575FFF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PackerCLI", "PackerCLI\PackerCLI.csproj", "{C586F9B9-3651-4B66-9EBF-61DE61825230}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{9901CC98-6531-437B-931C-18626B575FFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9901CC98-6531-437B-931C-18626B575FFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9901CC98-6531-437B-931C-18626B575FFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C586F9B9-3651-4B66-9EBF-61DE61825230}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C586F9B9-3651-4B66-9EBF-61DE61825230}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C586F9B9-3651-4B66-9EBF-61DE61825230}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C586F9B9-3651-4B66-9EBF-61DE61825230}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

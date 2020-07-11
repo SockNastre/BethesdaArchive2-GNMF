@@ -45,6 +45,8 @@
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.removeFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStripMain = new System.Windows.Forms.MenuStrip();
@@ -80,11 +82,9 @@
             this.listViewAssets.TabIndex = 7;
             this.listViewAssets.UseCompatibleStateImageBehavior = false;
             this.listViewAssets.View = System.Windows.Forms.View.Details;
-            this.listViewAssets.ItemActivate += new System.EventHandler(this.listViewAssets_ItemActivate);
             this.listViewAssets.SelectedIndexChanged += new System.EventHandler(this.listViewAssets_SelectedIndexChanged);
             this.listViewAssets.DragDrop += new System.Windows.Forms.DragEventHandler(this.listViewAssets_DragDrop);
             this.listViewAssets.DragEnter += new System.Windows.Forms.DragEventHandler(this.listViewAssets_DragEnter);
-            this.listViewAssets.DoubleClick += new System.EventHandler(this.listViewAssets_DoubleClick);
             // 
             // fileToolStripMenuItem
             // 
@@ -160,7 +160,9 @@
             this.addFolderToolStripMenuItem,
             this.toolStripSeparator3,
             this.removeFilesToolStripMenuItem,
-            this.selectAllToolStripMenuItem});
+            this.selectAllToolStripMenuItem,
+            this.toolStripSeparator4,
+            this.settingsToolStripMenuItem});
             this.archiveToolStripMenuItem.Name = "archiveToolStripMenuItem";
             this.archiveToolStripMenuItem.Size = new System.Drawing.Size(59, 20);
             this.archiveToolStripMenuItem.Text = "&Archive";
@@ -168,21 +170,21 @@
             // addFilesToolStripMenuItem
             // 
             this.addFilesToolStripMenuItem.Name = "addFilesToolStripMenuItem";
-            this.addFilesToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
+            this.addFilesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.addFilesToolStripMenuItem.Text = "Add &File(s)";
             this.addFilesToolStripMenuItem.Click += new System.EventHandler(this.addFilesToolStripMenuItem_Click);
             // 
             // addFolderToolStripMenuItem
             // 
             this.addFolderToolStripMenuItem.Name = "addFolderToolStripMenuItem";
-            this.addFolderToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
+            this.addFolderToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.addFolderToolStripMenuItem.Text = "Add F&older";
             this.addFolderToolStripMenuItem.Click += new System.EventHandler(this.addFolderToolStripMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(179, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(177, 6);
             // 
             // removeFilesToolStripMenuItem
             // 
@@ -190,7 +192,7 @@
             this.removeFilesToolStripMenuItem.Name = "removeFilesToolStripMenuItem";
             this.removeFilesToolStripMenuItem.ShortcutKeyDisplayString = "";
             this.removeFilesToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.Delete;
-            this.removeFilesToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
+            this.removeFilesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.removeFilesToolStripMenuItem.Text = "&Remove File(s)";
             this.removeFilesToolStripMenuItem.Click += new System.EventHandler(this.removeFilesToolStripMenuItem_Click);
             // 
@@ -198,9 +200,21 @@
             // 
             this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
             this.selectAllToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
-            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(182, 22);
+            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.selectAllToolStripMenuItem.Text = "Select A&ll";
             this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.selectAllToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(177, 6);
+            // 
+            // settingsToolStripMenuItem
+            // 
+            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.settingsToolStripMenuItem.Text = "&Settings";
+            this.settingsToolStripMenuItem.Click += new System.EventHandler(this.settingsToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -252,6 +266,7 @@
             this.Name = "Packer";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "BethesdaArchive2 GNMF Packer";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Packer_FormClosing);
             this.menuStripMain.ResumeLayout(false);
             this.menuStripMain.PerformLayout();
             this.ResumeLayout(false);
@@ -282,6 +297,8 @@
         private System.Windows.Forms.MenuStrip menuStripMain;
         private System.Windows.Forms.SaveFileDialog saveFileDialogGNMF;
         public System.Windows.Forms.OpenFileDialog openFileDialogGNF;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
     }
 }
 

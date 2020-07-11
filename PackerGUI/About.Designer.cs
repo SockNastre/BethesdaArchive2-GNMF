@@ -65,7 +65,7 @@
             this.labelAboutInformation.Name = "labelAboutInformation";
             this.labelAboutInformation.Size = new System.Drawing.Size(165, 39);
             this.labelAboutInformation.TabIndex = 30;
-            this.labelAboutInformation.Text = "BethesdaArchive2 GNMF Packer\r\nVersion: 1.1.2.0\r\nCopyright©  2020 SockNastre";
+            this.labelAboutInformation.Text = "BethesdaArchive2 GNMF Packer\r\nVersion: 1.2.3.1\r\nCopyright©  2020 SockNastre";
             // 
             // pictureBoxApplicationIcon
             // 
@@ -88,6 +88,7 @@
             this.Controls.Add(this.buttonOkay);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "About";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "About BethesdaArchive2 GNMF Packer";

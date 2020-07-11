@@ -1,11 +1,14 @@
-﻿using System;
+﻿using GNMFInterop;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace PackerGUI.Classes
 {
     // https://stackoverflow.com/a/1118396/10216412
-    class ListViewUtils
+    public static class ListViewSelectionUtils
     {
         private const int LVM_FIRST = 0x1000;
         private const int LVM_SETITEMSTATE = LVM_FIRST + 43;
@@ -36,18 +39,18 @@ namespace PackerGUI.Classes
         /// Select all rows on the given listview
         /// </summary>
         /// <param name="list">The listview whose items are to be selected</param>
-        public static void SelectAll(ListView list)
+        public static void SelectAll(this ListView list)
         {
-            ListViewUtils.SetItemState(list, -1, 2, 2);
+            ListViewSelectionUtils.SetItemState(list, -1, 2, 2);
         }
 
         /// <summary>
         /// Deselect all rows on the given listview
         /// </summary>
         /// <param name="list">The listview whose items are to be deselected</param>
-        public static void DeselectAll(ListView list)
+        public static void DeselectAll(this ListView list)
         {
-            ListViewUtils.SetItemState(list, -1, 2, 0);
+            ListViewSelectionUtils.SetItemState(list, -1, 2, 0);
         }
 
         /// <summary>
@@ -66,6 +69,34 @@ namespace PackerGUI.Classes
             };
 
             SendMessageLVItem(list.Handle, LVM_SETITEMSTATE, itemIndex, ref lvItem);
+        }
+    }
+
+    public static class ListViewExtensions
+    {
+        public static List<GNF> ConvertItemsToGNFList(this ListView listView)
+        {
+            var items = listView.Items;
+            var gnfList = new List<GNF>();
+
+            if (items.Count == 0)
+                throw new ArgumentOutOfRangeException("listView.Items.Count", listView.Items.Count, "ListView item count must be greater than 0.");
+
+            foreach (ListViewItem item in items)
+            {
+                var gnfFile = new GNF
+                {
+                    EntryStr = item.Text,
+                    RealPath = item.SubItems[1].Text
+                };
+
+                if (File.Exists(gnfFile.RealPath))
+                {
+                    gnfList.Add(gnfFile);
+                }
+            }
+
+            return gnfList;
         }
     }
 }

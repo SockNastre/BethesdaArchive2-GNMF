@@ -3,77 +3,112 @@ using PackerGUI.Classes;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace PackerGUI
 {
     public partial class Packer : Form
     {
-        public string ArchivePath = String.Empty;
+        private Ini SettingsIni;
+        private string ArchiveSavePath;
+        private bool IsArchiveSaved = true;
+        private bool IsPackingCurrently = false;
 
         public Packer()
         {
             InitializeComponent();
+
+            string iniPath = AppDomain.CurrentDomain.BaseDirectory + "\\BethesdaArchive2 GNMF Packer.ini";
+            Ini settingsIni;
+
+            // All code following is for managing the ini configuration file used by the tool
+            if (File.Exists(iniPath))
+            {
+                settingsIni = new Ini(iniPath);
+
+                if (this.IsIniValid(settingsIni))
+                {
+                    this.SettingsIni = settingsIni;
+                    return;
+                }
+                else
+                {
+                    File.Delete(iniPath);
+                }
+            }
+
+            // When all else fails, code comes here and just remakes the ini file
+            settingsIni = new Ini();
+            settingsIni.Data.Add("Archive", new Dictionary<string, string> { { "IsStringTableSaved", "True" } });
+            settingsIni.WriteToFile(iniPath);
+
+            this.SettingsIni = settingsIni;
+        }
+
+        private void Packer_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (IsPackingCurrently)
+            {
+                DialogResult abortMessage = MessageBox.Show("Archive not finished packing, are you sure you want to exit?", 
+                    string.Empty, MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
+                e.Cancel = abortMessage == DialogResult.No;
+            }
+            else if (!IsArchiveSaved)
+            {
+                DialogResult exitMessage = MessageBox.Show("Archive not saved, are you sure you want to exit?",
+                    string.Empty, MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+
+                e.Cancel = exitMessage == DialogResult.No;
+            }
+
+            // Saves ini file
+            string iniPath = AppDomain.CurrentDomain.BaseDirectory + "\\BethesdaArchive2 GNMF Packer.ini";
+            this.SettingsIni.WriteToFile(iniPath);
         }
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GUI.ResetForm(this);
+            if (!IsArchiveSaved)
+            {
+                DialogResult exitMessage = MessageBox.Show("Changes have not been saved, save first?",
+                    string.Empty, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+
+                if (exitMessage == DialogResult.Yes)
+                {
+                    if (string.IsNullOrEmpty(ArchiveSavePath))
+                    {
+                        saveAsToolStripMenuItem.PerformClick();
+                    }
+                    else
+                    {
+                        saveToolStripMenuItem.PerformClick();
+                    }
+                }
+                else if (exitMessage == DialogResult.Cancel)
+                {
+                    return;
+                }
+            }
+
+            this.ResetForm();
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            try
-            {
-                if (string.IsNullOrEmpty(ArchivePath)) return;
-
-                List<GNF> gnf = GUI.ConvertListViewItems(listViewAssets.Items);
-
-                string formText = this.Text;
-                this.Text = "Packing...";
-
-                GNMF.Write(ArchivePath, gnf);
-
-                this.Text = formText;
-                MessageBox.Show("Done!", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
-            catch (Exception ex)
-            {
-                // Indicates the user cancelled the writing process somehow
-                if (ex.Message.Equals("Cancel")) return;
-
-                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            List<GNF> gnfList = listViewAssets.ConvertItemsToGNFList();
+            this.PackGNMFBA2(this.ArchiveSavePath, gnfList);
         }
 
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            try
+            if (saveFileDialogGNMF.ShowDialog() == DialogResult.OK)
             {
-                if (saveFileDialogGNMF.ShowDialog() == DialogResult.OK)
-                {
-                    string savePath = saveFileDialogGNMF.FileName;
-                    List<GNF> gnf = GUI.ConvertListViewItems(listViewAssets.Items);
+                this.ArchiveSavePath = saveFileDialogGNMF.FileName;
+                saveToolStripMenuItem.Enabled = true;
 
-                    string formText = this.Text;
-                    this.Text = "Packing...";
-
-                    GNMF.Write(savePath, gnf);
-
-                    this.Text = formText;
-                    MessageBox.Show("Done!", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-
-                    // Sets public path to archive for "Save" function
-                    ArchivePath = savePath;
-                    saveToolStripMenuItem.Enabled = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                // Indicates the user cancelled the writing process somehow
-                if (ex.Message.Equals("Cancel")) return;
-
-                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                saveToolStripMenuItem.PerformClick();
             }
         }
 
@@ -86,71 +121,50 @@ namespace PackerGUI
         {
             if (openFileDialogGNF.ShowDialog() == DialogResult.OK)
             {
-                foreach (string file in openFileDialogGNF.FileNames)
-                {
-                    try
-                    {
-                        GUI.AddAsset(file, Path.GetFileName(file), listViewAssets);
-                        saveAsToolStripMenuItem.Enabled = true;
-                    }
-                    catch(Exception ex)
-                    {
-                        MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
+                listViewAssets.BeginUpdate();
+                this.AddAssets(openFileDialogGNF.FileNames);
+
+                listViewAssets.EndUpdate();
+                this.SetSaveButtonsEnableState();
             }
         }
 
         private void addFolderToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // Creates new instance of OpenFolderDialog, similar to OpenFileDialog except folders are selected
             var folderDialog = new OpenFolderDialog();
 
             if (folderDialog.ShowDialog(this) == DialogResult.OK)
             {
-                string dir = folderDialog.Folder;
-                int subLength = dir.Length + 1; // +1 accounts for an extra backslash
+                listViewAssets.BeginUpdate();
+                this.AddDirectoryAssets(folderDialog.Folder);
 
-                // If made true indicates that an asset was not imported because it wasn't GNF or was a duplicate entry string
-                bool errorAsset = false;
-
-                foreach (string file in Directory.GetFiles(dir, "*.*", SearchOption.AllDirectories))
-                {
-                    try
-                    {
-                        GUI.AddAsset(file, file.Substring(subLength), listViewAssets);
-                    }
-                    catch
-                    {
-                        errorAsset = true;
-                    }
-                }
-
-                // Checks to make sure there are items to be saved before enabling save button
-                if (listViewAssets.Items.Count > 0)
-                {
-                    saveAsToolStripMenuItem.Enabled = true;
-                }
-
-                if (errorAsset == true)
-                {
-                    MessageBox.Show("One or more assets has been omitted due to those assets not being GNF or being duplicate names.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                listViewAssets.EndUpdate();
+                this.SetSaveButtonsEnableState();
             }
         }
 
         private void removeFilesToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (IsPackingCurrently)
+                return;
+
             foreach (ListViewItem item in listViewAssets.SelectedItems)
             {
                 listViewAssets.Items.RemoveAt(item.Index);
             }
+
+            this.SetSaveButtonsEnableState();
         }
 
         private void selectAllToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // Function makes selecting large amounts of items more optimized
-            ListViewUtils.SelectAll(listViewAssets);
+            listViewAssets.SelectAll();
+        }
+
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var settingsForm = new Settings(this.SettingsIni);
+            settingsForm.ShowDialog();
         }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
@@ -159,85 +173,137 @@ namespace PackerGUI
             aboutForm.ShowDialog();
         }
 
-        private void listViewAssets_DoubleClick(object sender, EventArgs e)
-        {
-            var editorForm = new EntryStringEditor(listViewAssets.SelectedItems[0], this);
-            editorForm.ShowDialog();
-        }
-
         private void listViewAssets_DragDrop(object sender, DragEventArgs e)
         {
-            // If made true indicates that an asset was not imported because it wasn't GNF or was a duplicate entry string
-            bool errorAsset = false;
+            if (IsPackingCurrently)
+                return;
+
+            listViewAssets.BeginUpdate();
 
             string dir = ((string[])e.Data.GetData(DataFormats.FileDrop))[0];
             if (Directory.Exists(dir))
             {
-                int subLength = dir.Length + 1; // +1 accounts for an extra backslash
-                foreach (string file in Directory.GetFiles(dir, "*.*", SearchOption.AllDirectories))
-                {
-                    try
-                    {
-                        GUI.AddAsset(file, file.Substring(subLength), listViewAssets);
-                    }
-                    catch
-                    {
-                        errorAsset = true;
-                    }
-                }
+                this.AddDirectoryAssets(dir);
             }
             else
             {
-                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-                foreach (string file in files)
-                {
-                    try
-                    {
-                        GUI.AddAsset(file, Path.GetFileName(file), listViewAssets);
-                        saveAsToolStripMenuItem.Enabled = true;
-                    }
-                    catch
-                    {
-                        errorAsset = true;
-                    }
-                }
+                var assets = (string[])e.Data.GetData(DataFormats.FileDrop);
+                this.AddAssets(assets);
             }
 
-            // Checks to make sure there are items to be saved before enabling save button
-            if (listViewAssets.Items.Count > 0)
-            {
-                saveAsToolStripMenuItem.Enabled = true;
-            }
-
-            if (errorAsset == true)
-            {
-                MessageBox.Show("One or more assets has been omitted due to those assets not being GNF or being duplicate names.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            listViewAssets.EndUpdate();
+            this.SetSaveButtonsEnableState();
         }
 
         private void listViewAssets_DragEnter(object sender, DragEventArgs e)
         {
-            e.Effect = DragDropEffects.Copy;
-        }
-
-        private void listViewAssets_ItemActivate(object sender, EventArgs e)
-        {
-            if (listViewAssets.SelectedItems.Count == 0 || listViewAssets.SelectedItems.Count > 1) return;
-
-            var editorForm = new EntryStringEditor(listViewAssets.SelectedItems[0], this);
-            editorForm.ShowDialog();
+            e.Effect = IsPackingCurrently ? DragDropEffects.None : DragDropEffects.Copy;
         }
 
         private void listViewAssets_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (listViewAssets.SelectedItems.Count > 0)
+            removeFilesToolStripMenuItem.Enabled = listViewAssets.SelectedItems.Count > 0 ? true : false;
+        }
+
+        private bool IsIniValid(Ini ini)
+        {
+            try
             {
-                removeFilesToolStripMenuItem.Enabled = true;
+                string val = ini.Data["Archive"]["IsStringTableSaved"];
+                bool.Parse(val);
+
+                // If the above code works without exceptions, the ini is valid for this tool
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private void ResetForm()
+        {
+            this.ArchiveSavePath = string.Empty;
+            this.IsArchiveSaved = true;
+            saveToolStripMenuItem.Enabled = false;
+            saveAsToolStripMenuItem.Enabled = false;
+            removeFilesToolStripMenuItem.Enabled = false;
+            listViewAssets.Items.Clear();
+        }
+
+        private void SetSaveButtonsEnableState()
+        {
+            if (listViewAssets.Items.Count > 0)
+            {
+                saveToolStripMenuItem.Enabled = !string.IsNullOrEmpty(this.ArchiveSavePath);
+                saveAsToolStripMenuItem.Enabled = true;
             }
             else
             {
-                removeFilesToolStripMenuItem.Enabled = false;
+                saveToolStripMenuItem.Enabled = false;
+                saveAsToolStripMenuItem.Enabled = false;
+                IsArchiveSaved = true;
             }
+        }
+
+        private void AddAsset(string path, string entryString)
+        {
+            if (listViewAssets.FindItemWithText(entryString) != null || !GNF.IsFileValid(path))
+                return;
+
+            var item = new ListViewItem
+            {
+                Text = entryString
+            };
+
+            item.SubItems.Add(path);
+            listViewAssets.Items.Add(item);
+        }
+
+        private void AddAssets(string[] assetPaths)
+        {
+            int initialItemCount = listViewAssets.Items.Count;
+            bool initialArchiveSavedState = this.IsArchiveSaved;
+
+            foreach (string asset in assetPaths)
+            {
+                this.AddAsset(asset, Path.GetFileName(asset));
+            }
+
+            // If the ListView Item count is the same, nothing was added so save state is the same
+            this.IsArchiveSaved = initialItemCount == listViewAssets.Items.Count ? initialArchiveSavedState : false;
+        }
+
+        private void AddDirectoryAssets(string dir)
+        {
+            int initialItemCount = listViewAssets.Items.Count;
+            bool initialArchiveSavedState = this.IsArchiveSaved;
+
+            int subLength = dir.Length + 1; // +1 accounts for an extra backslash
+
+            foreach (string file in Directory.GetFiles(dir, "*", SearchOption.AllDirectories))
+            {
+                this.AddAsset(file, file.Substring(subLength));
+            }
+
+            // If the ListView Item count is the same, nothing was added so save state is the same
+            this.IsArchiveSaved = initialItemCount == listViewAssets.Items.Count ? initialArchiveSavedState : false;
+        }
+
+        private async void PackGNMFBA2(string path, List<GNF> assets)
+        {
+            string formText = this.Text;
+            this.Text = "Packing...";
+            this.IsPackingCurrently = true;
+            menuStripMain.Enabled = false;
+
+            await Task.Run(() => GNMF.Write(path, assets, bool.Parse(this.SettingsIni.Data["Archive"]["IsStringTableSaved"])));
+
+            this.IsArchiveSaved = true;
+            this.IsPackingCurrently = false;
+            menuStripMain.Enabled = true;
+            this.Text = formText;
+            MessageBox.Show("Done!", "", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
         }
     }
 }
