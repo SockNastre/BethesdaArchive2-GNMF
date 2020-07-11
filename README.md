@@ -21,5 +21,5 @@ A: By default this should be on, but this removes the table from the packed outp
 ### Credits
  - Thanks to [AlexxEG](https://github.com/AlexxEG) for help with understanding original BA2 format and helping me understand buffers and SharpZipLib.
  - Thanks to derwangler for getting me a proper CRC32 hashing class.
- - [DotNetZip](https://github.com/DinoChiesa/DotNetZip) library for zlib compression.
+ - [SharpZipLib](https://github.com/icsharpcode/SharpZipLib) library for zlib compression.
  - Josip Medved for the OpenFolderDialog.
