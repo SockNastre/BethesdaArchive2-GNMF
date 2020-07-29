@@ -65,7 +65,7 @@
             this.labelAboutInformation.Name = "labelAboutInformation";
             this.labelAboutInformation.Size = new System.Drawing.Size(165, 39);
             this.labelAboutInformation.TabIndex = 30;
-            this.labelAboutInformation.Text = "BethesdaArchive2 GNMF Packer\r\nVersion: 1.2.3.1\r\nCopyright©  2020 SockNastre";
+            this.labelAboutInformation.Text = "BethesdaArchive2 GNMF Packer\r\nVersion: 1.2.3.2\r\nCopyright©  2020 SockNastre";
             // 
             // pictureBoxApplicationIcon
             // 

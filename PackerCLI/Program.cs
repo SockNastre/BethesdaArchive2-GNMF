@@ -17,7 +17,7 @@ namespace PackerCLI
                 return;
             }
 
-            switch (args[0])
+            switch (args[0].ToLower())
             {
                 default:
                     {
@@ -28,7 +28,7 @@ namespace PackerCLI
                         
                             string inputDir = args[0];
                             args = new string[5];
-                            args[0] = "-p"; 
+                            args[0] = string.Empty; // Can equal blank string value
 
                             args[1] = "-i";
                             args[2] = inputDir;
@@ -38,18 +38,16 @@ namespace PackerCLI
 
                             goto case "-p";
                         }
-                        else
-                        {
-                            Program.ShowHelpText(true);
-                            return;
-                        }
+
+                        Program.ShowHelpText(true);
+                        break;
                     }
 
                 case "-h":
                 case "-help":
                     {
                         Program.ShowHelpText();
-                        return;
+                        break;
                     }
 
                 case "-p":
@@ -121,7 +119,7 @@ namespace PackerCLI
                         Console.WriteLine("Packing...");
                         GNMF.Write(outputPath, gnfList, isStrTableSaved);
 
-                        Console.WriteLine("Done!\n");
+                        Console.WriteLine("\nDone!\n");
                         break;
                     }
             }
@@ -134,10 +132,10 @@ namespace PackerCLI
                 Console.WriteLine("Invalid usage\n");
             }
 
-            Console.WriteLine("BethesdaArchive2 GNMF Packer Cli\nCopyright (c) 2020  SockNastre\nVersion: 1.0.0.0\n\n" +
+            Console.WriteLine("BethesdaArchive2 GNMF Packer Cli\nCopyright (c) 2020  SockNastre\nVersion: 1.0.1.0\n\n" +
                 "Usage: \"BethesdaArchive2 GNMF Packer Cli.exe\" <Command> <Options>\n\nCommands:\n-pack (-p)\n-help (-h)\n\n" +
-                "Pack Options:\n-nostrtbl\n-indir (-i)\n-out (-o)\n\nExamples:\n\n\"BethesdaArchive2 GNMF Packer Cli.exe\" -pack -i \"C:\\Data\" -o \"C:\\output.ba2\"" +
-                "\n                                       -pack -nostrtbl -i \"C:\\Data\" -o \"C:\\output.ba2\"\n\n");
+                "Pack Options:\n-nostrtbl\n-indir (-i)\n-out (-o)\n\nExamples:\n\n\"BethesdaArchive2 GNMF Packer Cli.exe\" -pack -i \"C:\\Data\" -o \"C:\\output.ba2\"\n" +
+                new string(' ', 39) + "-pack -nostrtbl -i \"C:\\Data\" -o \"C:\\output.ba2\"\n\n");
         }
     }
 }

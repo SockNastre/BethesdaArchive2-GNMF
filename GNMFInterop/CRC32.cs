@@ -1,14 +1,15 @@
 ﻿namespace GNMFInterop
 {
-    /*
-     * A simple standard little endian CRC32 implemenatation
-     * as documented here: http://web.mit.edu/freebsd/head/sys/libkern/crc32.c
-     */
-
+    /// <summary>
+    /// A simple standard little endian CRC32 implemenatation as documented <see href="http://web.mit.edu/freebsd/head/sys/libkern/crc32.c">here</see>.
+    /// Provides static methods for computing CRC32 hash from various data types.
+    /// </summary>
     public static class CRC32
     {
-        // Standard CRC32 hash table
-        private static readonly uint[] _crc32Table =
+        /// <summary>
+        /// Standard CRC32 hash table.
+        /// </summary>
+        private static readonly uint[] Table =
         {
             0x00000000, 0x77073096, 0xee0e612c, 0x990951ba, 0x076dc419, 0x706af48f,
             0xe963a535, 0x9e6495a3, 0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988,
@@ -56,7 +57,7 @@
         };
 
         /// <summary>
-        /// Compute a standard CRC32 checksum from a given buffer
+        /// Compute a standard CRC32 checksum from a given buffer.
         /// </summary>
         /// <param name="buf">The input buffer</param>
         /// <returns>The computed checksum</returns>
@@ -66,41 +67,19 @@
             int data = 0;
 
             while (data < buf.Length)
-                crc = _crc32Table[(crc ^ buf[data++]) & 0xFF] ^ (crc >> 8);
+                crc = Table[(crc ^ buf[data++]) & 0xFF] ^ (crc >> 8);
 
             return crc;
         }
 
         /// <summary>
-        /// Compute a standard CRC32 checksum from a given ASCII string
+        /// Compute a standard CRC32 checksum from a given ASCII string.
         /// </summary>
         /// <param name="str">The input string</param>
         /// <returns>The computed checksum</returns>
         public static uint Compute(string str)
         {
             return Compute(System.Text.Encoding.ASCII.GetBytes(str));
-        }
-
-        /// <summary>
-        /// Compare a buffer against a CRC32 checksum
-        /// </summary>
-        /// <param name="buf">The buffer to verify</param>
-        /// <param name="checksum">The checksum to verify against</param>
-        /// <returns>The comparison result</returns>
-        public static bool Verify(byte[] buf, uint checksum)
-        {
-            return Compute(buf) == checksum;
-        }
-
-        /// <summary>
-        /// Compare a string against a CRC32 checksum
-        /// </summary>
-        /// <param name="str">The string to verify</param>
-        /// <param name="checksum">The checksum to verify against</param>
-        /// <returns>The comparison result</returns>
-        public static bool Verify(string str, uint checksum)
-        {
-            return Verify(System.Text.Encoding.ASCII.GetBytes(str), checksum);
         }
     }
 }

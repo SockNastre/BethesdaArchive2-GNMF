@@ -8,14 +8,14 @@ using System.Windows.Forms;
 
 namespace PackerGUI
 {
-    public partial class Packer : Form
+    public partial class MainForm : Form
     {
         private Ini SettingsIni;
         private string ArchiveSavePath;
         private bool IsArchiveSaved = true;
         private bool IsPackingCurrently = false;
 
-        public Packer()
+        public MainForm()
         {
             InitializeComponent();
 
@@ -290,14 +290,14 @@ namespace PackerGUI
             this.IsArchiveSaved = initialItemCount == listViewAssets.Items.Count ? initialArchiveSavedState : false;
         }
 
-        private async void PackGNMFBA2(string path, List<GNF> assets)
+        private async void PackGNMFBA2(string path, List<GNF> assetList)
         {
             string formText = this.Text;
             this.Text = "Packing...";
             this.IsPackingCurrently = true;
             menuStripMain.Enabled = false;
 
-            await Task.Run(() => GNMF.Write(path, assets, bool.Parse(this.SettingsIni.Data["Archive"]["IsStringTableSaved"])));
+            await Task.Run(() => GNMF.Write(path, assetList, bool.Parse(this.SettingsIni.Data["Archive"]["IsStringTableSaved"])));
 
             this.IsArchiveSaved = true;
             this.IsPackingCurrently = false;

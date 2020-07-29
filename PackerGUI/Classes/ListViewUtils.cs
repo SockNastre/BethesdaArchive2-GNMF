@@ -7,7 +7,10 @@ using System.Windows.Forms;
 
 namespace PackerGUI.Classes
 {
-    // https://stackoverflow.com/a/1118396/10216412
+    /// <summary>
+    /// From <see href="https://stackoverflow.com/a/1118396/10216412">Stack Overflow thread</see>.
+    /// Provides static methods, structs, and fields for enhancing entire list selection capability in a ListView.
+    /// </summary>
     public static class ListViewSelectionUtils
     {
         private const int LVM_FIRST = 0x1000;
@@ -36,53 +39,58 @@ namespace PackerGUI.Classes
         public static extern IntPtr SendMessageLVItem(IntPtr hWnd, int msg, int wParam, ref LVITEM lvi);
 
         /// <summary>
-        /// Select all rows on the given listview
+        /// Select all rows in the given ListView.
         /// </summary>
-        /// <param name="list">The listview whose items are to be selected</param>
+        /// <param name="list">The ListView whose items are to be selected.</param>
         public static void SelectAll(this ListView list)
         {
             ListViewSelectionUtils.SetItemState(list, -1, 2, 2);
         }
 
         /// <summary>
-        /// Deselect all rows on the given listview
+        /// Deselect all rows in the given ListView.
         /// </summary>
-        /// <param name="list">The listview whose items are to be deselected</param>
+        /// <param name="list">The ListView whose items are to be deselected.</param>
         public static void DeselectAll(this ListView list)
         {
             ListViewSelectionUtils.SetItemState(list, -1, 2, 0);
         }
 
         /// <summary>
-        /// Set the item state on the given item
+        /// Set the item state on the given item.
         /// </summary>
-        /// <param name="list">The listview whose item's state is to be changed</param>
-        /// <param name="itemIndex">The index of the item to be changed</param>
-        /// <param name="mask">Which bits of the value are to be set?</param>
-        /// <param name="value">The value to be set</param>
+        /// <param name="list">The ListView whose item's state is to be changed.</param>
+        /// <param name="itemIndex">The index of the item to be changed.</param>
+        /// <param name="mask">Which bits of the value are to be set.</param>
+        /// <param name="value">The value to be set.</param>
         public static void SetItemState(ListView list, int itemIndex, int mask, int value)
         {
-            LVITEM lvItem = new LVITEM
+            var lvItem = new LVITEM
             {
                 stateMask = mask,
                 state = value
             };
 
-            SendMessageLVItem(list.Handle, LVM_SETITEMSTATE, itemIndex, ref lvItem);
+            ListViewSelectionUtils.SendMessageLVItem(list.Handle, LVM_SETITEMSTATE, itemIndex, ref lvItem);
         }
     }
 
+    /// <summary>
+    /// Provided static method for utilizing a ListView with the BSA packing process.
+    /// </summary>
     public static class ListViewExtensions
     {
+        /// <summary>
+        /// Converts items from <see cref="ListView"/> to a list of <see cref="GNF"/>.
+        /// </summary>
+        /// <param name="listView">ListView to be converted.</param>
+        /// <returns>List generated from ListView.</returns>
         public static List<GNF> ConvertItemsToGNFList(this ListView listView)
         {
-            var items = listView.Items;
+            ListView.ListViewItemCollection itemCollection = listView.Items;
             var gnfList = new List<GNF>();
 
-            if (items.Count == 0)
-                throw new ArgumentOutOfRangeException("listView.Items.Count", listView.Items.Count, "ListView item count must be greater than 0.");
-
-            foreach (ListViewItem item in items)
+            foreach (ListViewItem item in itemCollection)
             {
                 var gnfFile = new GNF
                 {

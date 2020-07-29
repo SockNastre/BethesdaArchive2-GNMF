@@ -9,25 +9,26 @@ namespace GNMFInterop
     public static class GNMF
     {
         /// <summary>
-        /// Writes GNMF BA2 using a list of assets.
+        /// Writes GNMf BA2 archive.
         /// </summary>
-        /// <param name="path">Path to save GNMF BA2.</param>
-        /// <param name="assets">List of GNF assets in correct format.</param>
-        public static void Write(string path, List<GNF> assets, bool isStrTableSaved)
+        /// <param name="path">Real filesystem path to write GNMF BA2 to.</param>
+        /// <param name="gnfList">List of <see cref="GNF"/> to write in GNMF BA2.</param>
+        /// <param name="isStrTableSaved">Ture or false if the string table will be written.</param>
+        public static void Write(string path, List<GNF> gnfList, bool isStrTableSaved)
         {
             using (var writer = new BinaryWriter(File.Open(path, FileMode.Create, FileAccess.Write, FileShare.Read)))
             {
                 writer.Write(0x58445442); // "BTDX"
                 writer.Write(1); // Version
                 writer.Write(0x464D4E47); // "GNMF"
-                writer.Write(assets.Count());
+                writer.Write(gnfList.Count());
                 writer.Write((long)0); // EntryStringTable Offset, remains 0 if saveStringTable is false
 
                 // Pads out Asset Records which we will write to later, each Asset Record takes up 72 bytes
-                writer.Write(new byte[assets.Count() * 72]);
+                writer.Write(new byte[gnfList.Count() * 72]);
 
                 // Writing texture data
-                foreach (GNF gnf in assets)
+                foreach (GNF gnf in gnfList)
                 {
                     gnf.Offset = (uint)writer.BaseStream.Position;
 
@@ -44,7 +45,7 @@ namespace GNMFInterop
                         textureData = reader.ReadBytes(textureDataLength);
                     }
                     // Data to be compressed is only the data of the GNF not it's header, header metadata is stored in Asset Records
-                    writer.Write(GetCompressedZlibData(textureData, gnf));
+                    writer.Write(GNMF.GetCompressedZlibData(textureData, gnf));
 
                     // Just the size of texture data, not the header
                     gnf.OrgSize = (uint)textureDataLength;
@@ -55,7 +56,7 @@ namespace GNMFInterop
                     long entryStringTableOffset = writer.BaseStream.Position;
 
                     // Writing EntryStringTable
-                    foreach (GNF gnf in assets)
+                    foreach (GNF gnf in gnfList)
                     {
                         writer.Write((ushort)gnf.EntryStr.Length);
                         writer.Write(gnf.EntryStr.ToCharArray());
@@ -71,7 +72,7 @@ namespace GNMFInterop
                 }
 
                 // Writing asset records
-                foreach (GNF gnf in assets)
+                foreach (GNF gnf in gnfList)
                 {
                     writer.Write(CRC32.Compute(Path.GetFileNameWithoutExtension(gnf.EntryStr).ToLower()));
                     writer.Write(0x00736464); // "dds" + 0x00, indicates asset format (in this case dds just means it's a texture)
@@ -90,19 +91,21 @@ namespace GNMFInterop
         }
 
         /// <summary>
-        /// Deflates byte[] using zlib's DEFAULT_COMPRESSION.
+        /// Compressed data using the zlib compression library.
         /// </summary>
-        /// <param name="data">byte[] to be deflated.</param>
-        /// <param name="gnf">GNF class file representing the byte[] metadata.</param>
-        /// <returns>Compressed byte[]</returns>
+        /// <param name="data">Data to be compressed.</param>
+        /// <param name="gnf">GNF class that is associated with that data.</param>
+        /// <returns>Compressed data</returns>
         private static byte[] GetCompressedZlibData(byte[] data, GNF gnf)
         {
-            if (data == null || data.Length == 0) return data;
+            if (data == null || data.Length == 0) 
+                return data;
 
             using (var inStream = new MemoryStream(data))
             {
                 var outStream = new MemoryStream();
                 var compressStream = new DeflaterOutputStream(outStream, new Deflater(Deflater.DEFAULT_COMPRESSION));
+
                 int bufferSize;
                 var buffer = new byte[4096];
 
@@ -111,9 +114,11 @@ namespace GNMFInterop
                     compressStream.Write(buffer, 0, bufferSize);
                 }
 
-                compressStream.Finish();
-                gnf.Size = (uint)outStream.Length;
-                return outStream.ToArray();
+                compressStream.Close();
+                byte[] outStreamData = outStream.ToArray();
+
+                gnf.Size = (uint)outStreamData.Length;
+                return outStreamData;
             }
         }
     }

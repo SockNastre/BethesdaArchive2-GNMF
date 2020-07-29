@@ -1,6 +1,6 @@
 ﻿namespace PackerGUI
 {
-    partial class Packer
+    partial class MainForm
     {
         /// <summary>
         /// Variable del diseñador necesaria.
