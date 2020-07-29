@@ -290,14 +290,14 @@ namespace PackerGUI
             this.IsArchiveSaved = initialItemCount == listViewAssets.Items.Count ? initialArchiveSavedState : false;
         }
 
-        private async void PackGNMFBA2(string path, List<GNF> assetList)
+        private async void PackGNMFBA2(string path, List<GNF> gnfList)
         {
             string formText = this.Text;
             this.Text = "Packing...";
             this.IsPackingCurrently = true;
             menuStripMain.Enabled = false;
 
-            await Task.Run(() => GNMF.Write(path, assetList, bool.Parse(this.SettingsIni.Data["Archive"]["IsStringTableSaved"])));
+            await Task.Run(() => GNMF.Write(path, gnfList, bool.Parse(this.SettingsIni.Data["Archive"]["IsStringTableSaved"])));
 
             this.IsArchiveSaved = true;
             this.IsPackingCurrently = false;
