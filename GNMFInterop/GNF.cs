@@ -10,7 +10,7 @@ namespace GNMFInterop
         public const int Magic = 0x20464E47; // "GNF "
         public const int HeaderSize = 256;
 
-        public string EntryStr { get; set; } = string.Empty;
+        public string EntryStr { get; set; }
         public string RealPath { get; set; }
 
         // These fields get set during packing

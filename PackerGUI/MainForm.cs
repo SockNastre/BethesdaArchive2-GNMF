@@ -3,6 +3,7 @@ using PackerGUI.Classes;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Remoting.Messaging;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -202,7 +203,7 @@ namespace PackerGUI
 
         private void listViewAssets_SelectedIndexChanged(object sender, EventArgs e)
         {
-            removeFilesToolStripMenuItem.Enabled = listViewAssets.SelectedItems.Count > 0 ? true : false;
+            removeFilesToolStripMenuItem.Enabled = listViewAssets.SelectedItems.Count > 0;
         }
 
         private bool IsIniValid(Ini ini)
